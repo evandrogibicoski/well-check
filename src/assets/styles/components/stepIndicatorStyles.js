@@ -1,0 +1,25 @@
+import {colors} from '../../theme';
+
+export const stepIndicatorStyles = {
+    stepIndicatorSize: 25,
+    currentStepIndicatorSize: 30,
+    separatorStrokeWidth: 2,
+    currentStepStrokeWidth: 3,
+    stepStrokeCurrentColor: colors.primary.main,
+    stepStrokeWidth: 3,
+    stepStrokeFinishedColor: colors.primary.main,
+    stepStrokeUnFinishedColor: '#aaaaaa',
+    separatorFinishedColor: colors.primary.main,
+    separatorUnFinishedColor: '#aaaaaa',
+    stepIndicatorFinishedColor: colors.primary.main,
+    stepIndicatorUnFinishedColor: '#ffffff',
+    stepIndicatorCurrentColor: '#ffffff',
+    stepIndicatorLabelFontSize: 13,
+    currentStepIndicatorLabelFontSize: 13,
+    stepIndicatorLabelCurrentColor: colors.primary.main,
+    stepIndicatorLabelFinishedColor: '#ffffff',
+    stepIndicatorLabelUnFinishedColor: '#aaaaaa',
+    labelColor: '#999999',
+    labelSize: 13,
+    currentStepLabelColor: colors.primary.main,
+};

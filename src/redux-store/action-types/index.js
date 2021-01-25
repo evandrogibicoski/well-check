@@ -1,0 +1,10 @@
+export const AUTH_LOGIN = 'AUTH_LOGIN';
+export const AUTH_CHECK = 'AUTH_CHECK';
+export const AUTH_LOGOUT = 'AUTH_LOGOUT';
+export const AUTH_SET_USER = 'AUTH_SET_USER';
+export const TOOLBAR_SET_TITLE = 'TOOLBAR_SET_TITLE';
+export const SHOW_ERROR = 'SHOW_ERROR';
+export const HIDE_ERROR = 'HIDE_ERROR';
+export const ADD_FILTERS = 'ADD_FILTERS';
+export const CLEAR_FILTERS = 'CLEAR_FILTERS';
+export const ADD_SELECTED_RECIPE = 'ADD_SELECTED_RECIPE';

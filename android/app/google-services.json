@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "561787930592",
+    "project_id": "wcm-test-1",
+    "storage_bucket": "wcm-test-1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:561787930592:android:58fb8fa968b4629b5dcd85",
+        "android_client_info": {
+          "package_name": "com.wellcheck"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "561787930592-6ie6r8ruubprtk4cjt8nf2j6r3pvphn0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjWk5mxY-CvGxCOSQkJ0Hfub8g7Afu9cQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "561787930592-6ie6r8ruubprtk4cjt8nf2j6r3pvphn0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

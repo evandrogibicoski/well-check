@@ -1,0 +1,6 @@
+android/.gradle
+android/.idea
+android/app/build
+ios/Pods
+ios/WellCheck.xcworkspace
+ios/WellCheck.xcodeproj/xcshareddata/xcschemes
