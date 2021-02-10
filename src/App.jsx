@@ -22,14 +22,12 @@ class App extends React.Component {
     render() {
         const {isAuthenticated} = this.props;
 
-        return <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
-            <View style={{flex: 1}}>
+        return <View style={{flex: 1}}>
                 {isAuthenticated
                     ? <SplashScreenNavigator/>
                     : <LogIn/>
                 }
-            </View>
-        </SafeAreaView>;
+            </View>;
     }
 }
 

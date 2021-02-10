@@ -81,7 +81,7 @@ class UserProfile extends Component {
         username        : 'required|min:3|alpha_num',
         last_name       : 'required|min:3|alpha_num',
         first_name      : 'required|min:3|alpha_num',
-        email           : 'required|email',
+        email           : 'email',
         phone           : 'required',
         password        : !this.props.isAuthenticated ? 'required|min:6' : 'min:6',
         hasUserAgreement: !this.props.isAuthenticated ? 'required:true' : '',
@@ -419,14 +419,11 @@ class UserProfile extends Component {
                                 onChangeText={this.onChangeText}
                                 blurOnSubmit={false}
                                 value={this.state.form.phone}
-                                icon='mail'
+                                icon='phone-portrait'
                                 error={errors.first('phone')}
                             />
                             <Input
-                                label={isAuthenticated
-                                    ? 'New password'
-                                    : 'Password'
-                                }
+                                label={isAuthenticated ? 'New password' : 'Password'}
                                 secureTextEntry
                                 name='password'
                                 returnKeyType='next'
@@ -440,12 +437,10 @@ class UserProfile extends Component {
                                 value={this.state.form.password}
                                 icon='md-lock-closed'
                                 error={errors.first('password')}
+                                visibilityToggle
                             />
                             <Input
-                                label={isAuthenticated
-                                    ? 'Confirm new password'
-                                    : 'Password confirmation'
-                                }
+                                label={isAuthenticated ? 'Confirm new password' : 'Password confirmation'}
                                 secureTextEntry
                                 name='password_confirmation'
                                 returnKeyType='done'
@@ -457,6 +452,7 @@ class UserProfile extends Component {
                                 value={this.state.form.password_confirmation}
                                 icon='md-lock-closed'
                                 error={passwordConfirmError}
+                                visibilityToggle
                             />
 
                             {!isAuthenticated && <>

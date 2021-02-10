@@ -1,53 +1,52 @@
-import { ScaledSheet } from 'react-native-size-matters'
-import { colors }      from '../../theme'
+import {ScaledSheet} from 'react-native-size-matters';
+import {colors}      from '../../theme';
 
 const signUpStyles = ScaledSheet.create({
-    container        : {
+    container: {
         flex             : 1,
-        paddingHorizontal: '40@vs'
+        paddingHorizontal: '40@vs',
     },
-    heading          : {
+    heading: {
         flexDirection : 'row',
         justifyContent: 'center',
         //paddingTop    : '20@ms0.3',
         paddingBottom : '20@ms0.3',
-        margin        : 0
+        margin        : 0,
     },
-    headingImage     : {
+    headingImage: {
         width          : '160@ms0.3',
         height         : '160@ms0.3',
         borderRadius   : '80@ms0.3',
         backgroundColor: colors.white,
         borderWidth    : '3@ms0.1',
-        borderColor    : colors.white
+        borderColor    : colors.white,
     },
-    imageContainer   : {
+    imageContainer: {
         width       : '140@ms0.3',
         height      : '140@ms0.3',
-        borderRadius: '70@ms0.3'
+        borderRadius: '70@ms0.3',
     },
-    form             : {
+    form: {
         flex             : 1,
         paddingHorizontal: '10@ms',
-        paddingBottom: '10@ms'
+        paddingBottom    : '10@ms',
     },
-    listItem         : {
+    listItem: {
         flexDirection: 'row',
-        marginLeft   : 0
+        marginLeft   : 0,
     },
-    listItemText     : {
+    listItemText: {
         paddingLeft: 13,
-        color: colors.mediumGrey
+        color      : colors.mediumGrey,
     },
     dialogContentView: {
         paddingBottom: 40,
-        paddingTop   : 10
+        paddingTop   : 10,
     },
-    dialogButton     : {
+    dialogButton: {
         justifyContent: 'center',
-        alignItems    : 'center'
+        alignItems    : 'center',
     },
+});
 
-})
-
-export default signUpStyles
+export default signUpStyles;

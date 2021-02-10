@@ -109,7 +109,7 @@ class WellCheckStatus extends Component {
                 androidStatusBarColor={'#2ec647'}
             >
                 <Body>
-                    <Title>Well Check Status</Title>
+                    <Title style={{color: 'white'}}>Well Check Status</Title>
                 </Body>
                 <Right>
                     <NativeButton transparent
@@ -165,7 +165,7 @@ class WellCheckStatus extends Component {
                             }
                         }}
                     >
-                        <Icon name='menu'/>
+                        <Icon name='menu' style={{color: 'white'}}/>
                     </NativeButton>
                 </Right>
             </Header>
@@ -182,18 +182,20 @@ class WellCheckStatus extends Component {
                 <Content padder
                     showsVerticalScrollIndicator
                 >
-                <Card style={{paddingBottom: 10}}>
+                <Card style={{paddingBottom: 10, width: '100%'}}>
                     {/* CASE 1 - No active latest submission found */}
                     {(submission === null) && <CardItem>
                     <Body style={{alignItems: 'center'}}>
-                        <Icon type="FontAwesome5" name="grin-beam-sweat"
+
+                        <Icon name="shield-checkmark"
                             style={{color: '#dddddd', fontSize: 70, marginBottom: 10}}
                         />
-                        <Text style={{textAlign: 'center'}}>
+                        {/*<Text style={{textAlign: 'center'}}>
                             Oops... we couldn't find any valid recent well check for you.
-                        </Text>
-                        <Text style={{textAlign: 'center', marginTop: 15}}>
-                            Please fill in a new survey for us:
+                        </Text>*/}
+                        {/*<Text style={{textAlign: 'center', marginTop: 15}}>*/}
+                        <Text style={{textAlign: 'center'}}>
+                            Please fill in a survey for us:
                         </Text>
                         <Button
                             disabled={isLoading}
@@ -282,49 +284,50 @@ class WellCheckStatus extends Component {
                         {/*<Text style={{fontWeight: 'bold', textAlign: 'center'}}>
                             Contact for {selectedEmployer.name}:
                         </Text>*/}
-                        <Text style={{fontWeight: 'bold', textAlign: 'center', marginTop: 12}}>
-                            COVID Officer Contact:
-                        </Text>
 
-                        {selectedEmployer.id && <>
-                            <Text style={{color: '#2288c0', fontWeight: 'bold'}}>
-                                {selectedEmployer.contact_first_name} {selectedEmployer.contact_last_name}
+                        {!!(selectedEmployer.id && selectedEmployer.representative) && <>
+                            <Text style={{fontWeight: 'bold', textAlign: 'center', marginTop: 12}}>
+                                COVID Officer Contact:
                             </Text>
 
-                            {selectedEmployer.contact_phone &&
+                            <Text style={{color: '#2288c0', fontWeight: 'bold'}}>
+                                {selectedEmployer.representative.first_name} {selectedEmployer.representative.last_name}
+                            </Text>
+
+                            {selectedEmployer.representative.phone &&
                             <Text style={{color: '#2288c0', fontWeight: 'bold', marginTop: 15}}
-                                onPress={() => Linking.openURL(`tel:${selectedEmployer.contact_phone}`)}
+                                onPress={() => Linking.openURL(`tel:${selectedEmployer.representative.phone}`)}
                             >
                                 <Icon
                                     type="Feather" name="phone"
                                     style={{fontSize: 17, color: '#2288c0'}}
                                 />
-                                &nbsp;&nbsp;{Utils.formatPhoneNumber(selectedEmployer.contact_phone)}
+                                &nbsp;&nbsp;{Utils.formatPhoneNumber(selectedEmployer.representative.phone)}
                             </Text>}
 
-                            {selectedEmployer.contact_email &&
+                            {selectedEmployer.representative.email &&
                             <Text style={{color: '#2288c0', fontWeight: 'bold', marginTop: 15}}
-                                onPress={() => Linking.openURL(`mailto:${selectedEmployer.contact_email}`)}
+                                onPress={() => Linking.openURL(`mailto:${selectedEmployer.representative.email}`)}
                             >
                                 <Icon
                                     type="Feather" name="mail"
                                     style={{fontSize: 17, color: '#2288c0'}}
                                 />
-                                &nbsp;&nbsp;{selectedEmployer.contact_email}
-                            </Text>}
-
-                            {selectedEmployer.contact_website &&
-                            <Text style={{color: '#2288c0', fontWeight: 'bold', marginTop: 15}}
-                                onPress={() => Linking.openURL(selectedEmployer.contact_website)}
-                            >
-                                <Icon
-                                    type="Feather" name="external-link"
-                                    style={{fontSize: 17, color: '#2288c0'}}
-                                />
-                                {/*&nbsp;&nbsp;Tap here for more info*/}
-                                &nbsp;&nbsp;Company COVID Policy
+                                &nbsp;&nbsp;{selectedEmployer.representative.email}
                             </Text>}
                         </>}
+
+                        {selectedEmployer.contact_website &&
+                        <Text style={{color: '#2288c0', fontWeight: 'bold', marginTop: 15}}
+                            onPress={() => Linking.openURL(selectedEmployer.contact_website)}
+                        >
+                            <Icon
+                                type="Feather" name="external-link"
+                                style={{fontSize: 17, color: '#2288c0'}}
+                            />
+                            {/*&nbsp;&nbsp;Tap here for more info*/}
+                            &nbsp;&nbsp;Company COVID Policy
+                        </Text>}
 
                         <Text style={{fontWeight: 'bold', marginTop: 15}}>
                             {user.first_name} {user.last_name}'s WellCheck

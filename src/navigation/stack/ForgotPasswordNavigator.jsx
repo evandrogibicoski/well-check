@@ -2,13 +2,13 @@ import {createAppContainer}            from 'react-navigation'
 import {createStackNavigator}          from 'react-navigation-stack';
 import {createMaterialTopTabNavigator} from 'react-navigation-tabs';
 
-import EmailForm          from '@screens/auth/forgot-password/EmailForm';
+import UsernameForm       from '@screens/auth/forgot-password/UsernameForm';
 import CodeValidationForm from '@screens/auth/forgot-password/CodeValidationForm';
 import NewPasswordForm    from '@screens/auth/forgot-password/NewPasswordForm';
 
 const RouteConfigs = {
-    EmailForm: {
-        screen: EmailForm,
+    UsernameForm: {
+        screen: UsernameForm,
     },
     CodeValidationForm: {
         screen: CodeValidationForm,
@@ -19,7 +19,7 @@ const RouteConfigs = {
 };
 
 const StackNavigatorConfig = {
-    initialRouteName : 'EmailForm',
+    initialRouteName : 'UsernameForm',
     headerMode       : 'none',
     navigationOptions: {
         gesturesEnabled: true,

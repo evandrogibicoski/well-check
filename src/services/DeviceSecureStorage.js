@@ -1,5 +1,6 @@
 import SecureStorage, { ACCESS_CONTROL, ACCESSIBLE, AUTHENTICATION_TYPE } from 'react-native-secure-storage'
-import { AsyncStorage } from '@react-native-community/async-storage'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 
 const config = {
     accessControl: ACCESS_CONTROL.BIOMETRY_ANY_OR_DEVICE_PASSCODE,
@@ -18,7 +19,8 @@ const DeviceSecureStorage = {
      */
     async saveKey(key, valueToSave) {
         try {
-            await SecureStorage.setItem(key, valueToSave, config);
+            if (Platform.OS === 'android') await SecureStorage.setItem(key, valueToSave, config);
+            else await AsyncStorage.setItem(key, valueToSave);
         } catch (error) {
             await AsyncStorage.setItem(key, valueToSave);
             console.log('AsyncStorage Error: ' + error.message);
@@ -27,7 +29,8 @@ const DeviceSecureStorage = {
 
     async getKey(key) {
         try {
-            return await SecureStorage.getItem(key, config);
+            if (Platform.OS === 'android') return await SecureStorage.getItem(key, config);
+            return await AsyncStorage.getItem(key);
         } catch (error) {
             console.log('AsyncStorage Error: ' + error.message);
             return await AsyncStorage.getItem(key);
@@ -36,7 +39,8 @@ const DeviceSecureStorage = {
 
     async deleteKey(key) {
         try{
-            await SecureStorage.removeItem(key);
+            if (Platform.OS === 'android') await SecureStorage.removeItem(key);
+            else await AsyncStorage.removeItem(key);
         } catch (error) {
             console.log('AsyncStorage Error: ' + error.message);
             await AsyncStorage.removeItem(key);

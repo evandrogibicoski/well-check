@@ -51,6 +51,7 @@ axios.interceptors.request.use(
 
 axiosInstance.interceptors.response.use(
     response => {
+        console.log('Interceptor error' + response.data);
         if (_.isString(response.data)) {
             store.dispatch(AuthService.logout());
         }

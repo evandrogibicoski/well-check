@@ -298,7 +298,7 @@ const styles = ScaledSheet.create({
         width         : initialState.screenWidth / 1.5,
         justifyContent: 'center',
         alignItems    : 'center',
-        height        : '35@ms0.3',
+        height        : '38@ms0.3',
     },
     buttonTextStyle: {
         marginLeft: '7@ms0.3',
@@ -327,5 +327,5 @@ const styles = ScaledSheet.create({
 
 export default connect(state => ({
     isAuthenticated: state.Auth.isAuthenticated,
-    user: state.Auth.user,
+    user           : state.Auth.user,
 }))(withNavigation(CheckIn));

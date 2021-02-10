@@ -1,28 +1,30 @@
 import React, {Component}      from 'react';
 import {withNavigation}        from 'react-navigation';
-import {connect}               from 'react-redux';
 import ReeValidate, {ErrorBag} from 'ree-validate';
 import StepIndicator           from 'react-native-step-indicator';
 
-import {Form, Text, Content, Container, Button, Card, CardItem, Icon} from 'native-base';
+import {
+    Form, Text, Content, Container, Button, Card, CardItem, Icon
+} from 'native-base';
 
-import signUpStyles                             from '@assets/styles/screens/signUpStyles';
-import Input                                    from '@components/common/Input';
-import {stepIndicatorStyles}                    from '@assets/styles/components/stepIndicatorStyles';
-import {AuthService}                            from '@services';
-import CustomButton                             from '@components/common/Button';
-import {Image, ImageBackground, Keyboard, View} from 'react-native';
 import generalStyles                            from '@assets/styles/generalStyles';
+import {stepIndicatorStyles}                    from '@assets/styles/components/stepIndicatorStyles';
 import logInStyles                              from '@assets/styles/screens/logInStyles';
+import signUpStyles                             from '@assets/styles/screens/signUpStyles';
 import {colors}                                 from '@assets/theme';
+import CustomButton                             from '@components/common/Button';
+import Input                                    from '@components/common/Input';
+import {AuthService}                            from '@services';
+import {Image, ImageBackground, Keyboard, View} from 'react-native';
 
 class CodeValidationForm extends Component {
     validator = {};
 
     state = {
-        token    : '',
+        code     : '',
         isLoading: false,
         errors   : new ErrorBag(),
+        username : this.props.navigation.getParam('username', ''),
     };
 
     /**
@@ -34,15 +36,16 @@ class CodeValidationForm extends Component {
 
     initialize = () => {
         this.validator = new ReeValidate.Validator({
-            token: 'required',
+            code: 'required',
         });
 
         this.validator.localize('en');
 
         this.setState({
-            token    : '',
+            code     : '',
             isLoading: false,
             errors   : new ErrorBag(),
+            username : this.props.navigation.getParam('username', ''),
         });
     };
 
@@ -50,10 +53,10 @@ class CodeValidationForm extends Component {
      * handles validation before submitting
      */
     handleSubmit = () => {
-        const {token} = this.state;
+        const {code} = this.state;
         const {errors} = this.validator;
 
-        this.validator.validateAll({token})
+        this.validator.validateAll({code})
             .then(success => {
                 if (success) {
                     this.submit();
@@ -66,14 +69,14 @@ class CodeValidationForm extends Component {
     submit = () => {
         this.setState({isLoading: true});
 
-        AuthService.checkPasswordResetToken({token: this.state.token})
-            .then(r => {
-                console.log(r);
+        const payload = {
+            username: this.state.username,
+            code    : this.state.code,
+        };
 
-                this.props.navigation.push('NewPasswordForm', {token: this.state.token});
-            })
-            .catch(e => { console.log(e); })
-            .finally(() => { this.setState({isLoading: false}); });
+        AuthService.checkResetCode(payload)
+            .then(() => this.props.navigation.push('NewPasswordForm', payload))
+            .finally(() => this.setState({isLoading: false}));
     };
 
     render() {
@@ -81,25 +84,26 @@ class CodeValidationForm extends Component {
 
         return <Container>
         <ImageBackground
-            resizeMode={'cover'}
+            resizeMode="cover"
             style={generalStyles.container}
             source={require('@assets/images/bg_pattern.png')}
         >
-            <Button
-                style={generalStyles.backButton}
-                onPress={() => this.props.navigation.goBack()}
-            >
-                <Icon name='arrow-back' style={{color: colors.primary.main}}/>
-            </Button>
-
             <Content padder
                 showsVerticalScrollIndicator={false}
             >
+                <Button
+                    iconLeft
+                    style={generalStyles.backButton}
+                    onPress={() => this.props.navigation.dismiss()}
+                >
+                    <Icon name="arrow-back" style={{color: colors.primary.main, marginLeft: 10}}/>
+                </Button>
+
                 <View style={logInStyles.heading}>
                     <Image
                         source={require('@assets/images/full-logo.png')}
                         style={logInStyles.headingImage}
-                        resizeMode='contain'
+                        resizeMode="contain"
                     />
                 </View>
 
@@ -114,21 +118,21 @@ class CodeValidationForm extends Component {
                     <CardItem bordered>
                         <Form style={signUpStyles.form}>
                             <Input
-                                label='Validate'
-                                name='token'
-                                onChangeText={(name, value) => this.setState({token: value})}
+                                label="Validation Code"
+                                name="code"
+                                onChangeText={(name, value) => this.setState({code: value})}
                                 blurOnSubmit={false}
-                                value={this.state.token}
-                                icon='mail'
-                                returnKeyType='done'
+                                value={this.state.code}
+                                icon="code"
+                                returnKeyType="done"
                                 onSubmitEditing={() => {
                                     this.handleSubmit();
                                     Keyboard.dismiss();
                                 }}
-                                error={errors.first('token')}
+                                error={errors.first('code')}
                             />
                             <CustomButton
-                                title='Send'
+                                title="Send"
                                 onPress={this.handleSubmit}
                                 isLoading={isLoading}
                             />
@@ -141,8 +145,4 @@ class CodeValidationForm extends Component {
     }
 }
 
-const mapDispatchToProps = dispatch => ({
-    checkPasswordResetToken: (token) => dispatch(AuthService.checkPasswordResetToken(token)),
-});
-
-export default connect(null, mapDispatchToProps)(withNavigation(CodeValidationForm));
+export default withNavigation(CodeValidationForm);

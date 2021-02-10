@@ -7,7 +7,7 @@ import DeviceSecureStorage           from '@services/DeviceSecureStorage'
 
 const initialState = {
     isAuthenticated: false,
-    user: null,
+    user           : null,
 };
 
 const Auth = (state = initialState, {type, payload = null}) => {

@@ -67,6 +67,7 @@
 		4DEB2387BEFD4DAEA329A29D /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Solid.ttf; path = "../node_modules/native-base/Fonts/FontAwesome5_Solid.ttf"; sourceTree = "<group>"; };
 		5A5B0A86B51F462F9D9BE305 /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Feather.ttf"; sourceTree = "<group>"; };
 		5B43C265B4F448F088967D19 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/native-base/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
+		5C8271F225D0B5B800469CBD /* WellCheck.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = WellCheck.entitlements; path = WellCheck/WellCheck.entitlements; sourceTree = "<group>"; };
 		6029DC3145544FC1AD0EAA63 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/native-base/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		6204AA474F4091B725B45A2C /* Pods-WellCheck-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WellCheck-tvOS.release.xcconfig"; path = "Target Support Files/Pods-WellCheck-tvOS/Pods-WellCheck-tvOS.release.xcconfig"; sourceTree = "<group>"; };
 		6241FEB3BF064E219C2AF2F5 /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/native-base/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
@@ -162,6 +163,7 @@
 		13B07FAE1A68108700A75B9A /* WellCheck */ = {
 			isa = PBXGroup;
 			children = (
+				5C8271F225D0B5B800469CBD /* WellCheck.entitlements */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
@@ -375,7 +377,9 @@
 						TestTargetID = 13B07F861A680F5B00A75B9A;
 					};
 					13B07F861A680F5B00A75B9A = {
+						DevelopmentTeam = 9R35B64FCB;
 						LastSwiftMigration = 1120;
+						ProvisioningStyle = Manual;
 					};
 					2D02E47A1E0B4A5D006451C7 = {
 						CreatedOnToolsVersion = 8.2.1;
@@ -811,10 +815,16 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = WellCheck/WellCheck.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development: Cristian Serban (B5H9YLUSVT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Cristian Serban (B5H9YLUSVT)";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9R35B64FCB;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = WellCheck/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.1.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -822,6 +832,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.wellcheck;
 				PRODUCT_NAME = WellCheck;
+				PROVISIONING_PROFILE_SPECIFIER = "Well Check";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -834,9 +845,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = WellCheck/WellCheck.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development: Cristian Serban (B5H9YLUSVT)";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9R35B64FCB;
 				INFOPLIST_FILE = WellCheck/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.1.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -844,6 +860,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.wellcheck;
 				PRODUCT_NAME = WellCheck;
+				PROVISIONING_PROFILE_SPECIFIER = "Well Check";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};

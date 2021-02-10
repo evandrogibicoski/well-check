@@ -1,27 +1,26 @@
 import React, {Component}      from 'react';
 import {withNavigation}        from 'react-navigation';
-import { connect }             from 'react-redux';
 import ReeValidate, {ErrorBag} from 'ree-validate';
-import Input                   from '@components/common/Input';
+import StepIndicator           from 'react-native-step-indicator';
 
 import {
     Container, Content, Form, Button, Text, Card, CardItem, Left, Icon, Header, Body, Right
 } from 'native-base';
 
-import logInStyles                              from '@assets/styles/screens/logInStyles';
-import StepIndicator                            from 'react-native-step-indicator';
-import {stepIndicatorStyles}                    from '@assets/styles/components/stepIndicatorStyles';
-import {AuthService}                            from '@services';
-import CustomButton                             from '@components/common/Button';
-import {Image, ImageBackground, Keyboard, View} from 'react-native';
 import generalStyles                            from '@assets/styles/generalStyles';
+import {stepIndicatorStyles}                    from '@assets/styles/components/stepIndicatorStyles';
+import logInStyles                              from '@assets/styles/screens/logInStyles';
 import {colors}                                 from '@assets/theme';
+import CustomButton                             from '@components/common/Button';
+import Input                                    from '@components/common/Input';
+import {AuthService}                            from '@services';
+import {Image, ImageBackground, Keyboard, View} from 'react-native';
 
-class EmailForm extends Component {
+class UsernameForm extends Component {
     validator = {};
 
     state = {
-        email    : '',
+        username : '',
         isLoading: false,
         errors   : new ErrorBag(),
     };
@@ -35,13 +34,13 @@ class EmailForm extends Component {
 
     initialize = () => {
         this.setState({
-            email    : '',
+            username : '',
             isLoading: false,
             errors   : new ErrorBag(),
         });
 
         this.validator = new ReeValidate.Validator({
-            email: 'required|email',
+            username: 'required',
         });
 
         this.validator.localize('en');
@@ -51,10 +50,10 @@ class EmailForm extends Component {
      * handles validation before submitting
      */
     handleSubmit = () => {
-        const {email} = this.state;
+        const {username}  = this.state;
         const {errors} = this.validator;
 
-        this.validator.validateAll({email})
+        this.validator.validateAll({username})
             .then(success => {
                 if (success) {
                     this.submit();
@@ -67,13 +66,11 @@ class EmailForm extends Component {
     submit = () => {
         this.setState({isLoading: true});
 
-        AuthService.createPasswordResetToken({email: this.state.email})
-            .then(() => {
-                this.initialize();
-                this.props.navigation.navigate('CodeValidationForm');
-            })
-            .catch(e => console.log(e.response))
-            .finally(() => { this.setState({isLoading: false}); });
+        const payload = {username: this.state.username};
+
+        AuthService.forgotPassword(payload)
+            .then(() => this.props.navigation.navigate('CodeValidationForm', payload))
+            .finally(() => this.setState({isLoading: false}));
     };
 
     /**
@@ -84,25 +81,26 @@ class EmailForm extends Component {
 
         return <Container>
         <ImageBackground
-            resizeMode={'cover'}
+            resizeMode="cover"
             style={generalStyles.container}
             source={require('@assets/images/bg_pattern.png')}
         >
-            <Button
-                style={generalStyles.backButton}
-                onPress={() => this.props.navigation.dismiss()}
-            >
-                <Icon name='arrow-back' style={{color: colors.primary.main}}/>
-            </Button>
-
             <Content padder
                 showsVerticalScrollIndicator={false}
             >
+                <Button
+                    iconLeft
+                    style={generalStyles.backButton}
+                    onPress={() => this.props.navigation.dismiss()}
+                >
+                    <Icon name="arrow-back" style={{color: colors.primary.main, marginLeft: 10}}/>
+                </Button>
+
                 <View style={logInStyles.heading}>
                     <Image
                         source={require('@assets/images/full-logo.png')}
                         style={logInStyles.headingImage}
-                        resizeMode='contain'
+                        resizeMode="contain"
                     />
                 </View>
 
@@ -117,20 +115,20 @@ class EmailForm extends Component {
                     <CardItem bordered>
                         <Form style={logInStyles.form}>
                             <Input
-                                label='Email'
-                                onChangeText={(name, value) => this.setState({email: value})}
+                                label="Username"
+                                onChangeText={(name, value) => this.setState({username: value})}
                                 blurOnSubmit={false}
-                                value={this.state.email}
-                                returnKeyType='done'
+                                value={this.state.username}
+                                returnKeyType="done"
                                 onSubmitEditing={() => {
                                     this.handleSubmit();
                                     Keyboard.dismiss();
                                 }}
-                                icon='mail'
-                                error={errors.first('email')}
+                                icon="person"
+                                error={errors.first('username')}
                             />
                             <CustomButton
-                                title='Send'
+                                title="Send"
                                 onPress={this.handleSubmit}
                                 isLoading={isLoading}
                             />
@@ -143,8 +141,4 @@ class EmailForm extends Component {
     }
 }
 
-const mapDispatchToProps = dispatch => ({
-    createPasswordResetToken: (credentials) => dispatch(AuthService.createPasswordResetToken(credentials)),
-});
-
-export default connect(null, mapDispatchToProps)(withNavigation(EmailForm));
+export default withNavigation(UsernameForm);

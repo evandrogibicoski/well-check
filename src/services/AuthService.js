@@ -4,9 +4,9 @@ import React           from 'react';
 import { AuthService } from './index';
 import { store }       from '../redux-store';
 
-export const createPasswordResetToken = (credentials) => Http.post('create-token', credentials);
-export const checkPasswordResetToken = (data) => Http.post('check-token', data);
-export const resetPassword = (credentials) => Http.post('reset-password', credentials);
+export const forgotPassword = data => Http.post('password-resets/forgot-via-username', data);
+export const checkResetCode = data => Http.post('password-resets/check-via-username', data);
+export const resetPassword  = data => Http.post('password-resets/reset-via-username', data);
 
 export const login = (credentials) => {
     return new Promise((resolve, reject) => {

@@ -1,5 +1,5 @@
-import { createAppContainer }   from 'react-navigation';
-import { createStackNavigator } from 'react-navigation-stack';
+import {createAppContainer}   from 'react-navigation';
+import {createStackNavigator} from 'react-navigation-stack';
 
 import LogInForm               from '@screens/auth/LogInForm';
 import ForgotPasswordNavigator from './ForgotPasswordNavigator';

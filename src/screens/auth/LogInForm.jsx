@@ -154,6 +154,7 @@ class LogInForm extends Component {
                                     error={errors.first('password')}
                                     secureTextEntry
                                     icon='md-lock-closed'
+                                    visibilityToggle
                                 />
                                 <Text
                                     style={logInStyles.forgotPasswordTextStyle}
