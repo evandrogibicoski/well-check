@@ -12,11 +12,12 @@ export default {
         return Http.delete(`users/${ids}`);
     },
 
-    getAuthenticatedUser: ()     => Http.get('profile'),
-    create              : (data) => Http.post('users', data),
-    updateProfile       : (data) => Http.put('profile', data),
-    updateProfileImage  : (data) => Http.post('profile/image', data),
-    deleteProfile       : (data) => Http.delete('profile/own-account', data)
+    getAuthenticatedUser           : () => Http.get('profile'),
+    create                         : data => Http.post('users', data),
+    updateProfile                  : data => Http.put('profile', data),
+    updateProfileImage             : data => Http.post('profile/image', data),
+    deleteProfile                  : data => Http.delete('profile/own-account', data),
+    registerWithDefaultOrganization: data => Http.post('register-with-default-organization', data),
 
 };
 // export function all (pagination = {}) {

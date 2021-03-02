@@ -3,13 +3,13 @@ import {colors, fonts} from '../../theme';
 
 const logInStyles = ScaledSheet.create({
     form: {
-        flex             : 1,
-        paddingHorizontal: '10@s',
+        paddingHorizontal: '40@s',
+        marginTop: '40@ms0.1',
     },
     heading: {
         flexDirection : 'row',
         justifyContent: 'center',
-        paddingTop    : '40@ms0.3',
+        paddingTop    : '20@ms0.3',
         paddingBottom : '20@ms0.3',
         margin        : 0,
     },
@@ -22,10 +22,16 @@ const logInStyles = ScaledSheet.create({
         width : '45@ms0.3',
         height: '45@ms0.3',
     },
+    signUpTextStyle: {
+        color    : colors.primary.main,
+        textAlign: 'center',
+        marginTop: '40@ms0.1',
+    },
     forgotPasswordTextStyle: {
         color    : colors.primary.main,
-        textAlign: 'right',
-        marginTop: '13@ms0.1',
+        textAlign: 'center',
+        marginTop: '40@ms0.1',
+        marginBottom: '40@ms0.1',
     },
     partnershipText: {
         fontWeight       : 'bold',
@@ -37,6 +43,22 @@ const logInStyles = ScaledSheet.create({
         textAlignVertical: 'center',
         textAlign        : 'center',
         fontFamily       : fonts.base,
+    },
+    loginButton: {
+        marginTop: '50@ms0.1',
+    },
+    imageBackground: {
+        minHeight: '35%',
+        alignItems    : 'center',
+        justifyContent: 'center',
+        shadowColor: colors.black,
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
     },
 });
 

@@ -7,6 +7,7 @@ import Snackbar                                                         from 're
 import SecureStorage, {ACCESS_CONTROL, ACCESSIBLE, AUTHENTICATION_TYPE} from 'react-native-secure-storage'
 import DeviceSecureStorage                                              from './services/DeviceSecureStorage'
 import _                                                                from 'lodash';
+import * as action                                                      from './redux-store/actions';
 
 const axiosInstance = axios.create();
 // axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded';
@@ -14,13 +15,13 @@ const axiosInstance = axios.create();
 // axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 // axios.defaults.headers.common['Access-Control-Allow-Credentials'] = true;
 
-axiosInstance.defaults.baseURL = 'http://wellcheck.onlineapps.io/api/';
-// axiosInstance.defaults.baseURL = 'http://well-check.local/api/';
-// axiosInstance.defaults.baseURL = 'http://10.0.2.2/api/';
+axiosInstance.defaults.baseURL = __DEV__
+    ? 'http://wellcheck.onlineapps.io/api/'
+    : 'https://dashboard.wellcheck.app/api/';
 axiosInstance.defaults.headers = {
     'Access-Control-Allow-Credentials': true,
-    'X-Requested-With': 'XMLHttpRequest',
-    'Accept': 'application/json'
+    'X-Requested-With'                : 'XMLHttpRequest',
+    'Accept'                          : 'application/json',
 };
 
 axiosInstance.interceptors.request.use(config => {
@@ -61,9 +62,9 @@ axiosInstance.interceptors.response.use(
         const originalRequest = error.config;
         if (error && error.response) {
             if (error.response.status === 401) {
-                store.dispatch(AuthService.logout())
+                store.dispatch(action.authLogout())
             } else if ((error.response.status === 401) && !originalRequest._retry) { //TODO:IMPLEMENT REFRESH TOKEN
-                store.dispatch(AuthService.logout())
+                store.dispatch(action.authLogout())
                 // originalRequest._retry = true;
                 // return AuthService.getToken()
                 //     .then(token => {

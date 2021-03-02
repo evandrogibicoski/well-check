@@ -1,15 +1,16 @@
 // REACT ==================================================
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {ImageBackground, View, Linking} from 'react-native';
+import {View, Linking, Platform, ScrollView} from 'react-native';
 import {withNavigation} from 'react-navigation';
 import Moment from 'react-moment';
+import {Grid, Col} from 'react-native-easy-grid';
 
 import messaging from '@react-native-firebase/messaging';
 
 // STYLING ================================================
 import {
-    Body, Container, Content, Card, CardItem, Text, Header, Title, Left, Right, Button as NativeButton, Icon,
+    Body, Container, Card, CardItem, Text, Header, Title, Left, Right, Button as NativeButton, Icon,
     ActionSheet, Root, Picker
 } from 'native-base';
 
@@ -23,11 +24,12 @@ import {Loading} from '@components/common/Loading';
 import NoInternetScreen from '@components/common/NoInternetScreen';
 
 // SERVICES ===============================================
-import {ResetRequestService, SurveySubmissionService} from '@services';
+import {CheckInService, ResetRequestService, SurveySubmissionService} from '@services';
 
 // MISC ===================================================
-import _ from 'lodash';
-import Utils from '@src/Utils';
+import _                     from 'lodash';
+import Utils                 from '@src/Utils';
+import wellCheckStatusStyles from '../../../assets/styles/screens/wellCheckStatusStyles';
 
 const initialState = {
     isLoading: false,
@@ -37,6 +39,9 @@ const initialState = {
 
     // Selected employer for displaying contact information
     selectedEmployer: {},
+
+    // Check-in data (to be retrieve on component mount)
+    checkIn: null,
 };
 
 class WellCheckStatus extends Component {
@@ -47,7 +52,10 @@ class WellCheckStatus extends Component {
             this.setState({selectedEmployer: this.props.user.employers[0]});
         });
 
-        if (!Utils.isOffline() && this.props.isAuthenticated) this.retrieveWellCheck();
+        if (!Utils.isOffline() && this.props.isAuthenticated) {
+            this.retrieveWellCheck();
+            this.retrieveCheckIn();
+        }
     };
 
     componentDidMount() {
@@ -71,6 +79,11 @@ class WellCheckStatus extends Component {
                 .then(r => this.setState({submission: r.data.submission}))
                 .finally(() => this.setState({isLoading: false}));
         });
+    };
+
+    retrieveCheckIn = () => {
+        CheckInService.get()
+            .then(r => this.setState({checkIn: r.data.check_in}))
     };
 
     requestReset = () => {
@@ -104,259 +117,362 @@ class WellCheckStatus extends Component {
         const {user} = this.props;
 
         return <Root><Container>
-            <Header noLeft
-                style={{ backgroundColor: '#2ec647' }}
-                androidStatusBarColor={'#2ec647'}
-            >
-                <Body>
-                    <Title style={{color: 'white'}}>Well Check Status</Title>
-                </Body>
-                <Right>
-                    <NativeButton transparent
-                        disabled={isLoading}
-                        onPress={() => {
-                            if (submission === null) {
-                                return ActionSheet.show({
-                                    options          : ['Refresh', 'Back'],
-                                    cancelButtonIndex: 1,
-                                    title            : 'Actions',
-                                }, buttonIndex => {
-                                    switch (buttonIndex) {
-                                        // Refresh
-                                        case 0: return this.retrieveWellCheck();
-                                    }
-                                });
-                            }
-
-                            switch (submission.result) {
-                                case 'not_clear':
-                                    return ActionSheet.show({
-                                        options          : ['Refresh', 'Contact Company', 'Request Reset', 'Back'],
-                                        cancelButtonIndex: 3,
-                                        title            : 'Actions',
-                                    }, buttonIndex => {
-                                        switch (buttonIndex) {
-                                            // Refresh
-                                            case 0: return this.retrieveWellCheck();
-                                            // Contact Company
-                                            case 1: return this.state.selectedEmployer.id
-                                                ? Linking.openURL(this.state.selectedEmployer.contact_website)
-                                                : undefined;
-                                            // Request Reset
-                                            case 2: return this.requestReset();
-                                        }
-                                    });
-
-                                case 'clear':
-                                    return ActionSheet.show({
-                                        options          : ['Refresh', 'CHECKIN (Scan Code)', 'New WellCheck', 'Back'],
-                                        cancelButtonIndex: 3,
-                                        title            : 'Actions',
-                                    }, buttonIndex => {
-                                        switch (buttonIndex) {
-                                            // Refresh
-                                            case 0: return this.retrieveWellCheck();
-                                            // CHECKIN (Scan Code)
-                                            case 1: return this.props.screenProps.rootNavigation.navigate('CheckIn');
-                                            // New WellCheck
-                                            case 2: return this.props.navigation.navigate('WellCheckSurvey');
-                                        }
-                                    });
-                            }
-                        }}
-                    >
-                        <Icon name='menu' style={{color: 'white'}}/>
-                    </NativeButton>
-                </Right>
-            </Header>
-
             {isLoading
                 ? <Loading/>
                 :
                 <NoInternetScreen retryRequest={() => this.retrieveWellCheck()}>
-                <ImageBackground
-                    resizeMode={'cover'}
-                    style={generalStyles.container}
-                    source={require('@assets/images/bg_pattern.png')}
-                >
-                <Content padder
-                    showsVerticalScrollIndicator
-                >
-                <Card style={{paddingBottom: 10, width: '100%'}}>
+                {/*contentContainerStyle={{flexGrow: 1}}*/}
+                <ScrollView contentContainerStyle={{flexGrow: 1}}>
                     {/* CASE 1 - No active latest submission found */}
-                    {(submission === null) && <CardItem>
-                    <Body style={{alignItems: 'center'}}>
+                    {(submission === null) && <>
+                        <Card style={[wellCheckStatusStyles.statusCard, wellCheckStatusStyles.defaultStatusCard]}>
+                            <Grid>
+                                <Col size={40}>
+                                    <Body style={{alignItems: 'center'}}>
+                                        <Icon type="MaterialCommunityIcons" name="shield-off-outline"
+                                            style={{color: '#dddddd', fontSize: 100, marginBottom: 10}}
+                                        />
+                                    </Body>
+                                </Col>
 
-                        <Icon name="shield-checkmark"
-                            style={{color: '#dddddd', fontSize: 70, marginBottom: 10}}
-                        />
-                        {/*<Text style={{textAlign: 'center'}}>
-                            Oops... we couldn't find any valid recent well check for you.
-                        </Text>*/}
-                        {/*<Text style={{textAlign: 'center', marginTop: 15}}>*/}
-                        <Text style={{textAlign: 'center'}}>
-                            Please fill in a survey for us:
-                        </Text>
-                        <Button
-                            disabled={isLoading}
-                            title='Start Well Check'
-                            onPress={() => this.props.navigation.navigate('WellCheckSurvey')}
-                        />
-                    </Body>
-                    </CardItem>}
+                                <Col size={60} style={{paddingTop: 20, paddingRight: 40}}>
+                                    <Body style={{alignItems: 'center'}}>
+                                        <Text style={{
+                                            textAlign: 'center',
+                                            color: '#dddddd',
+                                            textTransform: 'uppercase',
+                                            fontWeight: 'bold',
+                                        }}>
+                                            It looks like you haven't completed any recent surveys.
+                                        </Text>
+                                    </Body>
+                                </Col>
+                            </Grid>
+                        </Card>
+
+                        <Body style={{flex: 1, justifyContent: 'center'}}>
+                            <Text style={{textAlign: 'center'}}>
+                                Please fill in a survey for us:
+                            </Text>
+
+                            <Grid style={{alignItems: 'center', maxHeight: 100}}>
+                                <Col size={10}></Col>
+                                <Col size={65}>
+                                    <Button
+                                        disabled={isLoading}
+                                        title='Start Well Check'
+                                        onPress={() => this.props.navigation.navigate('WellCheckSurvey')}
+                                    />
+                                </Col>
+                                <Col size={15} style={{paddingLeft: 10}}>
+                                    <Button
+                                        bordered
+                                        isLoading={isLoading}
+                                        title={<Icon style={{color: colors.secondary.main}} name="menu"/>}
+                                        onPress={() => {
+                                            return ActionSheet.show({
+                                                options: ['Refresh', 'Back'],
+                                                cancelButtonIndex: 1,
+                                                title: 'Actions',
+                                            }, buttonIndex => {
+                                                switch (buttonIndex) {
+                                                    // Refresh
+                                                    case 0: return this.retrieveWellCheck();
+                                                }
+                                            });
+                                        }}
+                                    />
+                                </Col>
+                                <Col size={10}></Col>
+                            </Grid>
+                        </Body>
+                    </>}
 
                     {/* CASE 2 - Go To Work */}
-                    {(submission != null && submission.result === 'clear') && <CardItem>
-                    <Body style={{alignItems: 'center'}}>
-                        <Icon name="shield-checkmark-sharp"
-                            style={{color: '#2ec647', fontSize: 70}}
-                        />
-                        <Text style={{color: '#2ec647', fontWeight: 'bold', fontSize: 25, textAlign: 'center'}}>
-                            GO TO WORK
-                        </Text>
-                        <Text style={{textAlign: 'center'}}>
-                            as scheduled
-                        </Text>
+                    {(submission != null && submission.result === 'clear') && <>
+                        <Card style={[wellCheckStatusStyles.statusCard, wellCheckStatusStyles.clearStatusCard]}>
+                            <Grid>
+                                <Col size={40}>
+                                    <Body style={{alignItems: 'center'}}>
+                                        <Icon name="shield-checkmark"
+                                            style={{color: 'white', fontSize: 100, marginBottom: 10}}
+                                        />
+                                    </Body>
+                                </Col>
 
-                        <Text style={{fontWeight: 'bold', marginTop: 15}}>
-                            {user.first_name} {user.last_name}'s WellCheck
-                        </Text>
+                                <Col size={60} style={{paddingTop: 20, paddingRight: 40}}>
+                                    <Body style={{alignItems: 'center'}}>
+                                        <View
+                                            style={{
+                                                backgroundColor: 'white',
+                                                paddingLeft: 10,
+                                                paddingRight: 10,
+                                                borderRadius: 10,
+                                            }}
+                                        >
+                                        <Text
+                                            style={{
+                                                color: colors.secondary.main,
+                                                fontWeight: 'bold',
+                                                fontSize: 30,
+                                                textAlign: 'center',
+                                            }}
+                                        >
+                                            {this.state.checkIn ? 'CHECKED-IN' : 'GO TO WORK'}
+                                        </Text>
+                                        </View>
+                                        {!this.state.checkIn && <Text
+                                            style={{
+                                                textAlign: 'center',
+                                                color: 'white',
+                                                textTransform: 'uppercase',
+                                                marginTop: 5,
+                                                fontWeight: 'bold',
+                                            }}
+                                        >
+                                            as scheduled
+                                        </Text>}
+                                    </Body>
+                                </Col>
+                            </Grid>
+                        </Card>
 
-                        <Moment format="M/D/YYYY h:mm A" element={Text} date={submission.created_at}/>
+                        <Body style={{flex: 1, justifyContent: 'center'}}>
+                            <Text style={{fontWeight: 'bold'}}>
+                                {user.first_name} {user.last_name}'s WellCheck
+                            </Text>
 
-                        <Button
-                            isLoading={isLoading}
-                            title='Workplace Check-In'
-                            onPress={() => this.props.screenProps.rootNavigation.navigate('CheckIn')}
-                        />
-                    </Body>
-                    </CardItem>}
+                            <Moment format="M/D/YYYY h:mm A" element={Text} date={submission.created_at}/>
+
+                            <Grid style={{alignItems: 'center', maxHeight: 100}}>
+                                <Col size={10}></Col>
+                                <Col size={65}>
+                                    <Button
+                                        isLoading={isLoading}
+                                        title='Workplace Check-In'
+                                        onPress={() => this.props.screenProps.rootNavigation.navigate('CheckIn')}
+                                    />
+                                </Col>
+                                <Col size={15} style={{paddingLeft: 10}}>
+                                    <Button
+                                        bordered
+                                        isLoading={isLoading}
+                                        title={<Icon style={{color: colors.secondary.main}} name="menu"/>}
+                                        onPress={() => {
+                                            return ActionSheet.show({
+                                                options: ['Refresh', 'CHECKIN (Scan Code)', 'New WellCheck', 'Back'],
+                                                cancelButtonIndex: 3,
+                                                title: 'Actions',
+                                            }, buttonIndex => {
+                                                switch (buttonIndex) {
+                                                    // Refresh
+                                                    case 0:
+                                                        return this.retrieveWellCheck();
+                                                    // CHECKIN (Scan Code)
+                                                    case 1:
+                                                        return this.props.screenProps.rootNavigation.navigate('CheckIn');
+                                                    // New WellCheck
+                                                    case 2:
+                                                        return this.props.navigation.navigate('WellCheckSurvey');
+                                                }
+                                            });
+                                        }}
+                                    />
+                                </Col>
+                                <Col size={10}></Col>
+                            </Grid>
+                        </Body>
+                    </>}
 
                     {/* CASE 3 - Stay Home */}
-                    {(submission != null && submission.result === 'not_clear') && <CardItem>
-                    <Body style={{alignItems: 'center'}}>
-                        <Icon name="warning-sharp"
-                            style={{color: '#ff1616', fontSize: 70}}
-                        />
-                        <Text style={{color: '#ff1616', fontWeight: 'bold', fontSize: 25, textAlign: 'center'}}>
-                            STAY HOME
-                        </Text>
-                        <Text style={{textAlign: 'center'}}>
-                            as scheduled
-                        </Text>
+                    {(submission != null && submission.result === 'not_clear') && <>
+                        <Card style={[wellCheckStatusStyles.statusCard, wellCheckStatusStyles.notClearStatusCard]}>
+                            <Grid>
+                                <Col size={40}>
+                                    <Body style={{alignItems: 'center', paddingTop: 25}}>
+                                        <Icon name="warning-sharp"
+                                            style={{color: 'white', fontSize: 100, marginBottom: 10}}
+                                        />
+                                    </Body>
+                                </Col>
 
-                        <Text style={{marginTop: 20}}>
-                            Please be safe and healthy.
-                        </Text>
-                        <Text style={{marginBottom: 12}}>
-                            Monitor your symptoms.
-                        </Text>
+                                <Col size={60} style={{paddingRight: 40}}>
+                                    <Body style={{alignItems: 'center'}}>
+                                        <View
+                                            style={{
+                                                backgroundColor: 'white',
+                                                paddingLeft: 10,
+                                                paddingRight: 10,
+                                                borderRadius: 10,
+                                            }}
+                                        >
+                                        <Text
+                                            style={{
+                                                color: colors.red,
+                                                fontWeight: 'bold',
+                                                fontSize: 30,
+                                                textAlign: 'center',
+                                            }}
+                                        >
+                                            {Utils.hasPermissionTo('read_demo_survey') ? 'WE\'RE SORRY' :'STAY HOME'}
+                                        </Text>
+                                        </View>
+                                        {!this.state.checkIn && <Text
+                                            style={{
+                                                textAlign: 'center',
+                                                color: 'white',
+                                                textTransform: 'uppercase',
+                                                marginTop: 5,
+                                                fontWeight: 'bold',
+                                            }}
+                                        >
+                                            {Utils.hasPermissionTo('read_demo_survey')
+                                                ? 'we\'re working on improving your workplace'
+                                                : 'as scheduled by the organization'
+                                            }
+                                        </Text>}
 
-                        {!!submission.reset_requests.length && <>
-                            <Text>
-                                <Text style={{color: 'red', fontWeight: 'bold'}}>! </Text>
-                                You requested a survey reset at:
+                                        {!Utils.hasPermissionTo('read_demo_survey') &&
+                                            <Text
+                                                style={{
+                                                    marginTop: 30,
+                                                    textTransform: 'uppercase',
+                                                    textAlign: 'center',
+                                                    color: 'white',
+                                                    fontWeight: 'bold',
+                                                }}
+                                            >
+                                                Please be safe and healthy.
+                                                Monitor your symptoms.
+                                            </Text>
+                                        }
+                                    </Body>
+                                </Col>
+                            </Grid>
+                        </Card>
+
+                        <Body style={{flex: 1, justifyContent: 'center'}}>
+                            {!!submission.reset_requests.length && <>
+                                <Text>
+                                    <Text style={{color: 'red', fontWeight: 'bold'}}>! </Text>
+                                    You requested a survey reset at:
+                                </Text>
+
+                                <Moment format="M/D/YYYY h:mm A" element={Text}
+                                    date={submission.reset_requests[0].created_at}
+                                />
+                            </>}
+
+                            {/* NOTE this below dropdown can be used if multiple organizations are desired */}
+                            {/*<Text style={{textAlign: 'left', alignSelf: 'stretch', marginLeft: 35}}>
+                                Company Contact:
                             </Text>
+                            <Picker note
+                                mode="dropdown"
+                                style={{width: 300}}
+                                selectedValue={selectedEmployer.id}
+                                onValueChange={value => this.setState({
+                                    selectedEmployer: _.find(user.employers, {id: value})
+                                })}
+                            >
+                                {user.employers.map(employer => <Picker.Item key={employer.id}
+                                    label={employer.name}
+                                    value={employer.id}
+                                />)}
+                            </Picker>*/}
 
-                            <Moment format="M/D/YYYY h:mm A" element={Text}
-                                date={submission.reset_requests[0].created_at}
-                            />
-                        </>}
+                            {/*<Text style={{fontWeight: 'bold', textAlign: 'center'}}>
+                                Contact for {selectedEmployer.name}:
+                            </Text>*/}
 
-                        {/* NOTE this below dropdown can be used if multiple organizations are desired */}
-                        {/*<Text style={{textAlign: 'left', alignSelf: 'stretch', marginLeft: 35}}>
-                            Company Contact:
-                        </Text>
-                        <Picker note
-                            mode="dropdown"
-                            style={{width: 300}}
-                            selectedValue={selectedEmployer.id}
-                            onValueChange={value => this.setState({
-                                selectedEmployer: _.find(user.employers, {id: value})
-                            })}
-                        >
-                            {user.employers.map(employer => <Picker.Item key={employer.id}
-                                label={employer.name}
-                                value={employer.id}
-                            />)}
-                        </Picker>*/}
+                            {!!(selectedEmployer.id && selectedEmployer.representative) && <>
+                                <Text style={{fontWeight: 'bold', textAlign: 'center', marginTop: 12}}>
+                                    {Platform.OS === 'ios' ? 'Supervisor Contact:' : 'COVID Officer Contact:'}
+                                </Text>
 
-                        {/*<Text style={{fontWeight: 'bold', textAlign: 'center'}}>
-                            Contact for {selectedEmployer.name}:
-                        </Text>*/}
+                                <Text style={{color: '#2288c0', fontWeight: 'bold'}}>
+                                    {selectedEmployer.representative.first_name} {selectedEmployer.representative.last_name}
+                                </Text>
 
-                        {!!(selectedEmployer.id && selectedEmployer.representative) && <>
-                            <Text style={{fontWeight: 'bold', textAlign: 'center', marginTop: 12}}>
-                                COVID Officer Contact:
-                            </Text>
+                                {selectedEmployer.representative.phone &&
+                                <Text style={{color: '#2288c0', fontWeight: 'bold', marginTop: 15}}
+                                    onPress={() => Linking.openURL(`tel:${selectedEmployer.representative.phone}`)}
+                                >
+                                    <Icon
+                                        type="Feather" name="phone"
+                                        style={{fontSize: 17, color: '#2288c0'}}
+                                    />
+                                    &nbsp;&nbsp;{Utils.formatPhoneNumber(selectedEmployer.representative.phone)}
+                                </Text>}
 
-                            <Text style={{color: '#2288c0', fontWeight: 'bold'}}>
-                                {selectedEmployer.representative.first_name} {selectedEmployer.representative.last_name}
-                            </Text>
+                                {selectedEmployer.representative.email &&
+                                <Text style={{color: '#2288c0', fontWeight: 'bold', marginTop: 15}}
+                                    onPress={() => Linking.openURL(`mailto:${selectedEmployer.representative.email}`)}
+                                >
+                                    <Icon
+                                        type="Feather" name="mail"
+                                        style={{fontSize: 17, color: '#2288c0'}}
+                                    />
+                                    &nbsp;&nbsp;{selectedEmployer.representative.email}
+                                </Text>}
+                            </>}
 
-                            {selectedEmployer.representative.phone &&
+                            {selectedEmployer.contact_website &&
                             <Text style={{color: '#2288c0', fontWeight: 'bold', marginTop: 15}}
-                                onPress={() => Linking.openURL(`tel:${selectedEmployer.representative.phone}`)}
+                                onPress={() => Linking.openURL(selectedEmployer.contact_website)}
                             >
                                 <Icon
-                                    type="Feather" name="phone"
+                                    type="Feather" name="external-link"
                                     style={{fontSize: 17, color: '#2288c0'}}
                                 />
-                                &nbsp;&nbsp;{Utils.formatPhoneNumber(selectedEmployer.representative.phone)}
+                                &nbsp;&nbsp;{Platform.OS === 'ios' ? 'Company Policy' : 'Company COVID Policy'}
                             </Text>}
 
-                            {selectedEmployer.representative.email &&
-                            <Text style={{color: '#2288c0', fontWeight: 'bold', marginTop: 15}}
-                                onPress={() => Linking.openURL(`mailto:${selectedEmployer.representative.email}`)}
-                            >
-                                <Icon
-                                    type="Feather" name="mail"
-                                    style={{fontSize: 17, color: '#2288c0'}}
-                                />
-                                &nbsp;&nbsp;{selectedEmployer.representative.email}
-                            </Text>}
-                        </>}
+                            <Text style={{fontWeight: 'bold', marginTop: 15}}>
+                                {user.first_name} {user.last_name}'s WellCheck
+                            </Text>
 
-                        {selectedEmployer.contact_website &&
-                        <Text style={{color: '#2288c0', fontWeight: 'bold', marginTop: 15}}
-                            onPress={() => Linking.openURL(selectedEmployer.contact_website)}
-                        >
-                            <Icon
-                                type="Feather" name="external-link"
-                                style={{fontSize: 17, color: '#2288c0'}}
-                            />
-                            {/*&nbsp;&nbsp;Tap here for more info*/}
-                            &nbsp;&nbsp;Company COVID Policy
-                        </Text>}
+                            <Moment format="M/D/YYYY h:mm A" element={Text} date={submission.created_at}/>
 
-                        <Text style={{fontWeight: 'bold', marginTop: 15}}>
-                            {user.first_name} {user.last_name}'s WellCheck
-                        </Text>
-
-                        <Moment format="M/D/YYYY h:mm A" element={Text} date={submission.created_at}/>
-
-                        <View style={generalStyles.buttonsContainerView}>
-                            <View style={generalStyles.leftButton}>
-                                <Button
-                                    bordered
-                                    isLoading={isLoading}
-                                    title={<Icon style={{color: colors.green}} name="reload"/>}
-                                    onPress={this.retrieveWellCheck}
-                                />
-                            </View>
-                            <View style={{...generalStyles.rightButton, flexGrow: 3.5}}>
-                                <Button
-                                    isLoading={isLoading}
-                                    title="Request Reset"
-                                    onPress={this.requestReset}
-                                />
-                            </View>
-                        </View>
-                    </Body>
-                    </CardItem>}
-                </Card>
-                </Content>
-                </ImageBackground>
+                            <Grid style={{alignItems: 'center', maxHeight: 100}}>
+                                <Col size={10}></Col>
+                                <Col size={65}>
+                                    <Button
+                                        isLoading={isLoading}
+                                        title="Request Reset"
+                                        onPress={this.requestReset}
+                                    />
+                                </Col>
+                                <Col size={15} style={{paddingLeft: 10}}>
+                                    <Button
+                                        bordered
+                                        isLoading={isLoading}
+                                        title={<Icon style={{color: colors.secondary.main}} name="menu"/>}
+                                        onPress={() => {
+                                            return ActionSheet.show({
+                                                options: ['Refresh', 'Contact Company', 'Request Reset', 'Back'],
+                                                cancelButtonIndex: 3,
+                                                title: 'Actions',
+                                            }, buttonIndex => {
+                                                switch (buttonIndex) {
+                                                    // Refresh
+                                                    case 0: return this.retrieveWellCheck();
+                                                    // Contact Company
+                                                    case 1: return this.state.selectedEmployer.id
+                                                        ? Linking.openURL(this.state.selectedEmployer.contact_website)
+                                                        : undefined;
+                                                    // Request Reset
+                                                    case 2: return this.requestReset();
+                                                }
+                                            });
+                                        }}
+                                    />
+                                </Col>
+                                <Col size={10}></Col>
+                            </Grid>
+                        </Body>
+                    </>}
+                </ScrollView>
                 </NoInternetScreen>
             }
         </Container></Root>;

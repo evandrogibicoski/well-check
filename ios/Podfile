@@ -17,7 +17,9 @@ target 'WellCheck' do
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
   pod 'RNFS', :path => '../node_modules/react-native-fs'
-
+  pod 'Firebase/Core'
+  pod 'Firebase/Messaging'
+  pod 'RNFBApp', :path => '../node_modules/@react-native-firebase/app'
   pod 'React', :path => '../node_modules/react-native/'
   pod 'React-Core', :path => '../node_modules/react-native/'
 

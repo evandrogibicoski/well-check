@@ -1,5 +1,6 @@
-import NetInfo from '@react-native-community/netinfo';
+import NetInfo          from '@react-native-community/netinfo';
 import parsePhoneNumber from 'libphonenumber-js';
+import { store }        from './redux-store';
 
 export default {
     /**
@@ -99,5 +100,29 @@ export default {
         return number.country === 'US'
             ? number.formatNational()
             : number.formatInternational();
+    },
+
+    /**
+     * Check if the user has the appropriate permission
+     * @return {Boolean}
+     */
+    hasPermissionTo (permission) {
+        // grab current state
+        const state = store.getState();
+        let user  = state.Auth.user;
+        let check = false;
+        if (user && user.permissions) {
+            if (Array.isArray(permission)) {
+                let checks = [];
+                for (let i in permission) {
+                    checks[i] = user.permissions.includes(permission);
+                    check     = check || checks[i];
+                }
+            } else {
+                check = user.permissions.includes(permission);
+            }
+        }
+
+        return check;
     },
 };

@@ -23,11 +23,11 @@ class App extends React.Component {
         const {isAuthenticated} = this.props;
 
         return <View style={{flex: 1}}>
-                {isAuthenticated
-                    ? <SplashScreenNavigator/>
-                    : <LogIn/>
-                }
-            </View>;
+            {isAuthenticated
+                ? <SplashScreenNavigator/>
+                : <LogIn/>
+            }
+        </View>;
     }
 }
 

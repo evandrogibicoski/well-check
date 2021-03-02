@@ -3,21 +3,21 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>561787930592-qdepp9osufjek1golb1djh3p5a461ka2.apps.googleusercontent.com</string>
+	<string>263334942601-3e9s0lc7hl4hm2fu32udcht9uqorqeab.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.561787930592-qdepp9osufjek1golb1djh3p5a461ka2</string>
+	<string>com.googleusercontent.apps.263334942601-3e9s0lc7hl4hm2fu32udcht9uqorqeab</string>
 	<key>API_KEY</key>
-	<string>AIzaSyBYRug7zQtdPoPavWj-49ipLfUDMqaxfhE</string>
+	<string>AIzaSyCNfo5Esc6vB1CG8S9-h-MlbhyyOAAhPIU</string>
 	<key>GCM_SENDER_ID</key>
-	<string>561787930592</string>
+	<string>263334942601</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.wellcheck</string>
 	<key>PROJECT_ID</key>
-	<string>wcm-test-1</string>
+	<string>wellcheck-mobile</string>
 	<key>STORAGE_BUCKET</key>
-	<string>wcm-test-1.appspot.com</string>
+	<string>wellcheck-mobile.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -29,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:561787930592:ios:ffc49df544aaac355dcd85</string>
+	<string>1:263334942601:ios:80ab415337ece9b716f358</string>
 </dict>
 </plist>

@@ -1,18 +1,20 @@
 // REACT ==================================================
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Dimensions, ImageBackground, StyleSheet, View} from 'react-native';
+import {Dimensions, Image, View, Platform, ScrollView} from 'react-native';
 import {withNavigation} from 'react-navigation';
+import {ScaledSheet} from 'react-native-size-matters';
+import {Grid, Col, Row} from 'react-native-easy-grid';
 
 // STYLING ================================================
 import {Body, Container, Content, Card, CardItem, Text} from 'native-base';
 import StepIndicator from 'react-native-step-indicator';
 // import Swiper from 'react-native-swiper';
 import generalStyles from '@assets/styles/generalStyles';
+import {colors} from '@assets/theme';
 
 // COMPONENTS =============================================
 import ButtonGroup from './ButtonGroup';
-import WellCheckSurveySvg from './WellCheckSurveySvg';
 import Button from '@components/common/Button';
 import {Loading} from '@components/common/Loading';
 import NoInternetScreen from '@components/common/NoInternetScreen';
@@ -23,20 +25,50 @@ import {SurveyService, SurveySubmissionService} from '@services';
 // MISC ===================================================
 import _ from 'lodash';
 
-const styles = StyleSheet.create({
+const styles = ScaledSheet.create({
     stepperView: {
-        marginTop: 30,
+        marginTop: 15,
+        marginBottom: 15,
     },
     surveyCard: {
         marginTop: 60,
         paddingVertical: 30,
-    }
+    },
+
+    heading: {
+        position      : 'absolute',
+        top           : 30,
+        left          : 0,
+        right         : 0,
+        bottom        : 0,
+        flexDirection : 'row',
+        justifyContent: 'center',
+        margin        : 0,
+    },
+    headingImage: {
+        width : '175@ms0.3',
+        height: '175@ms0.3',
+        margin: 30
+    },
 });
 
+const images = {
+    g046_thermometer   : require('@assets/icons/g046_thermometer.png'),
+    g044_medical_record: require('@assets/icons/g044_medical_record.png'),
+    g028_virus         : require('@assets/icons/g028_virus.png'),
+    g013_face_mask     : require('@assets/icons/g013_face_mask.png'),
+};
+
 const stepperStyles = {
-    stepIndicatorSize: 35,
-    currentStepIndicatorSize: 40,
-    stepStrokeCurrentColor: '#2ec646',
+    stepIndicatorSize: 6,
+    currentStepIndicatorSize: 11,
+    separatorStrokeWidth: 0,
+    currentStepIndicatorLabelFontSize: 0,
+    stepIndicatorLabelFontSize: 0,
+    stepStrokeCurrentColor: '#ddd',
+    stepIndicatorCurrentColor: '#ddd',
+    stepIndicatorFinishedColor: '#ddd',
+    stepIndicatorUnFinishedColor: '#ddd',
     // separatorStrokeWidth: 3,
     // currentStepStrokeWidth: 5,
     // separatorFinishedColor: '#4aae4f',
@@ -118,7 +150,7 @@ class WellCheckSurvey extends Component {
 
     retrieveSurveyData = () => {
         this.setState({isLoading: true}, () => {
-            SurveyService.get()
+            SurveyService.get(Platform.OS)
                 .then(r => {
                     const surveyData = r.data.survey;
 
@@ -188,148 +220,144 @@ class WellCheckSurvey extends Component {
         isLoading
             ? <Loading/>
             :
-            <ImageBackground
-                resizeMode={'cover'}
-                style={generalStyles.container}
-                source={require('@assets/images/bg_pattern.png')}
-            >
-            {!!surveyData && <Content padder
-                showsVerticalScrollIndicator
-            >
-                <View style={styles.stepperView}>
-                <StepIndicator
-                    currentPosition={step}
-                    customStyles={stepperStyles}
-                >
-                </StepIndicator>
+            <>
+            {!!surveyData && <ScrollView contentContainerStyle={{flexGrow: 1}} automaticallyAdjustContentInsets={false}>
+                <View style={{flex: 1}}>
+                    {/* BEGIN Dynamic Survey */}
+                    {Object.keys(surveyData)
+                           .map(pageKey => <>
+                               {(
+                                 step === surveyData[pageKey].step && (
+                                   (
+                                     !('when_yes' in surveyData[pageKey]) &&
+                                     !('when_no' in surveyData[pageKey])
+                                   ) || (
+                                     'when_yes' in surveyData[pageKey] &&
+                                     surveyValues[surveyData[pageKey].when_yes.page][surveyData[pageKey].when_yes.item] === true
+                                   ) || (
+                                     'when_no' in surveyData[pageKey] &&
+                                     surveyValues[surveyData[pageKey].when_no.page][surveyData[pageKey].when_no.item] === false
+                                   )
+                                 )
+                               ) && <View style={{flex: 1}}>
+                                   {('icon' in surveyData[pageKey]) && <Card style={{
+                                       backgroundColor: colors.darkGrey,
+                                       minHeight      : 270,
+                                       marginLeft     : -15,
+                                       marginRight    : -15,
+                                       marginBottom   : 0,
+                                       marginTop      : -5
+                                   }}>
+                                       <View style={styles.heading}>
+                                           <Image
+                                             source={images[surveyData[pageKey].icon]}
+                                             style={styles.headingImage}
+                                             resizeMode='contain'
+                                           />
+                                       </View>
+                                   </Card>}
+
+                                   {/*<Body style={{marginTop: 30}}/>*/}
+                                   <Grid style={{alignItems: 'center'}}>
+                                       <Col style={{justifyContent: 'center', flex: 1}}>
+                                           {('text' in surveyData[pageKey]) &&
+                                           <Row style={{justifyContent: 'center', flex: 1}}>
+                                               <CardItem style={{width: '100%'}}>
+                                                   <Text style={{textAlign: 'center'}}>
+                                                       {surveyData[pageKey].text}
+                                                   </Text>
+                                               </CardItem>
+                                           </Row>}
+
+                                           {Object.keys(surveyData[pageKey].items)
+                                                  .map(itemKey => {
+                                                      return <>
+                                                          {!!(
+                                                            (
+                                                              !('when_yes' in surveyData[pageKey].items[itemKey]) &&
+                                                              !('when_no' in surveyData[pageKey].items[itemKey])
+                                                            ) || (
+                                                              'when_yes' in surveyData[pageKey].items[itemKey] &&
+                                                              surveyValues[pageKey][surveyData[pageKey].items[itemKey].when_yes] === true
+                                                            ) || (
+                                                              'when_no' in surveyData[pageKey].items[itemKey] &&
+                                                              surveyValues[pageKey][surveyData[pageKey].items[itemKey].when_no] === false
+                                                            )
+                                                          ) &&
+                                                          <Row style={{
+                                                              justifyContent: 'center',
+                                                              flex          : 1,
+                                                              width         : '100%'
+                                                          }}><Body
+                                                            style={{flex: 1, justifyContent: 'center'}}><CardItem>
+                                                              <Body style={{alignItems: 'center'}}>
+                                                                  <Text style={{textAlign: 'center'}}>
+                                                                      {surveyData[pageKey].items[itemKey].text}
+                                                                  </Text>
+                                                                  <ButtonGroup
+                                                                    answer={surveyValues[pageKey][itemKey]}
+                                                                    onAny={answer => {
+                                                                        this.updateSurveyAnswer(pageKey, itemKey,
+                                                                          answer);
+                                                                    }}
+                                                                  ></ButtonGroup>
+                                                              </Body>
+                                                          </CardItem>
+                                                          </Body>
+                                                          </Row>}
+                                                      </>;
+                                                  })
+                                           }
+                                       </Col>
+                                   </Grid>
+                               </View>}
+                           </>)}
+
+                    {/* Survey End Page */}
+                    {step === 4 &&
+                    <Col style={{justifyContent: 'center'}}>
+                        <View>
+                            <>
+                                <CardItem>
+                                    <Body style={{alignItems: 'center', marginTop: 50}}>
+                                        <Text style={{textAlign: 'center', marginBottom: 20}}>
+                                            You confirm that all answers are accurate and
+                                            allow {this.state.selectedEmployer.name} to have access to these answers.
+                                        </Text>
+
+                                        <Button
+                                          isLoading={isLoading}
+                                          title='Confirm'
+                                          onPress={this.submitSurvey}
+                                        />
+                                        <Button bordered
+                                          disabled={isLoading}
+                                          title='Restart Well Check'
+                                          onPress={this.gotoStart}
+                                        />
+                                    </Body>
+                                </CardItem>
+                            </>
+                        </View>
+                    </Col>}
+                    {/* END Dynamic Survey */}
+
+                    <View style={styles.stepperView}>
+                        <Grid>
+                            <Col size={30}/>
+                            <Col size={40}>
+                                <StepIndicator
+                                  currentPosition={step}
+                                  customStyles={stepperStyles}
+                                >
+                                </StepIndicator>
+                            </Col>
+                            <Col size={30}/>
+                        </Grid>
+                    </View>
                 </View>
-
-                {/*<Swiper
-                    loop={false}
-                    index={step}
-                    autoplay={false}
-                    showsButtons={false}
-                    dot={<Text/>}
-                    activeDot={<Text/>}
-                >
-                    <View>
-                        <Card style={styles.surveyCard}>
-                        <CardItem>
-                        <Body style={{align: 'center'}}>
-                        <Text>Hello 1</Text>
-                        </Body>
-                        </CardItem>
-                        </Card>
-                    </View>
-                    <View>
-                        <Card style={styles.surveyCard}>
-                        <CardItem>
-                        <Body style={{align: 'center'}}>
-                        <Text>
-                            Try to insert some very long text here - it won't fit since the swiper element cuts it off
-                        </Text>
-                        </Body>
-                        </CardItem>
-                        </Card>
-                    </View>
-                    <View>
-                        <Card style={styles.surveyCard}>
-                        <CardItem>
-                        <Body style={{align: 'center'}}>
-                        <Text>Finality of al</Text>
-                        </Body>
-                        </CardItem>
-                        </Card>
-                    </View>
-                </Swiper>*/}
-
-                {/* BEGIN Dynamic Survey */}
-                {Object.keys(surveyData).map(pageKey => <View key={pageKey}>
-                {(
-                    step === surveyData[pageKey].step && (
-                        (
-                            !('when_yes' in surveyData[pageKey]) &&
-                            !('when_no' in surveyData[pageKey])
-                        ) || (
-                            'when_yes' in surveyData[pageKey] &&
-                            surveyValues[surveyData[pageKey].when_yes.page][surveyData[pageKey].when_yes.item] === true
-                        ) || (
-                            'when_no' in surveyData[pageKey] &&
-                            surveyValues[surveyData[pageKey].when_no.page][surveyData[pageKey].when_no.item] === false
-                        )
-                    )
-                ) && <Card style={styles.surveyCard}>
-                    {('text' in surveyData[pageKey]) && <CardItem>
-                    <Body style={{alignItems: 'center', marginBottom: 10}}>
-                        <Text style={{textAlign: 'center'}}>
-                            {surveyData[pageKey].text}
-                        </Text>
-                    </Body>
-                    </CardItem>}
-
-                    {('icon' in surveyData[pageKey]) && <Body style={{alignItems: 'center'}}>
-                        <WellCheckSurveySvg type={surveyData[pageKey].icon}/>
-                    </Body>}
-
-                    {Object.keys(surveyData[pageKey].items).map(itemKey => {
-                        return <View key={itemKey}>
-                        {!!(
-                            (
-                                !('when_yes' in surveyData[pageKey].items[itemKey]) &&
-                                !('when_no' in surveyData[pageKey].items[itemKey])
-                            ) || (
-                                'when_yes' in surveyData[pageKey].items[itemKey] &&
-                                surveyValues[pageKey][surveyData[pageKey].items[itemKey].when_yes] === true
-                            ) || (
-                                'when_no' in surveyData[pageKey].items[itemKey] &&
-                                surveyValues[pageKey][surveyData[pageKey].items[itemKey].when_no] === false
-                            )
-                        ) && <CardItem>
-                            <Body style={{alignItems: 'center'}}>
-                                <Text style={{textAlign: 'center'}}>
-                                    {surveyData[pageKey].items[itemKey].text}
-                                </Text>
-                                <ButtonGroup
-                                    answer={surveyValues[pageKey][itemKey]}
-                                    onAny={answer => {
-                                        this.updateSurveyAnswer(pageKey, itemKey, answer);
-                                    }}
-                                ></ButtonGroup>
-                            </Body>
-                        </CardItem>}
-                        </View>;
-                    })}
-                </Card>}
-                </View>)}
-
-                {/* Survey End Page */}
-                {step === 4 &&
-                <View>
-                <Card style={styles.surveyCard}>
-                <CardItem>
-                <Body style={{alignItems: 'center'}}>
-                    <Text style={{textAlign: 'center'}}>
-                        You confirm that all answers are accurate and allow {this.state.selectedEmployer.name} to have access to these answers.
-                    </Text>
-
-                    <Button
-                        isLoading={isLoading}
-                        title='Confirm'
-                        onPress={this.submitSurvey}
-                    />
-                    <Button bordered
-                        disabled={isLoading}
-                        title='Restart Well Check'
-                        onPress={this.gotoStart}
-                    />
-                </Body>
-                </CardItem>
-                </Card>
-                </View>}
-                {/* END Dynamic Survey */}
-
-            </Content>}
-            </ImageBackground>
+            </ScrollView>}
+            </>
         }</Container>;
     }
 }
